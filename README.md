@@ -8,7 +8,7 @@ A program used to check information about Pokemon.
 - tqdm
 
 ## Usage
-Clone repository and run `pip install -r requirements.txt`. Project has built-in database of Pokemon up to 9th generation. You use the program with `main.py`. The program will then instruct you on further usage.
+Clone repository and run `pip install -r requirements.txt`. Project has built-in database of Pokemon up to 9th generation. You use the program with symbolic link `main`. The program will then instruct you on further usage.
 
 ## Notes
 - Program works offline, using included database.
