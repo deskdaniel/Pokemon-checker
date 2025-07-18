@@ -4,7 +4,7 @@ import csv
 import json
 #import os
 from tqdm import tqdm
-from database import safe_request
+from safe_request import safe_request
 
 def create_types_chart(path_to_csv):
     url = 'https://pokeapi.co/api/v2/type/?limit=100'
@@ -58,7 +58,7 @@ def create_types_chart(path_to_csv):
             response, delay = safe_request(data_url, max_retries=max_retries, delay=delay, fail_delay=fail_delay)
 
             data = response.json()
-            type_name = data['name']
+            type_name = data['name'].capitalize()
 
             defensive_dictionary = base_dictionary.copy()
             double_damage_from = []

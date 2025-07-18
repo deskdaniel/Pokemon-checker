@@ -1,31 +1,13 @@
 import requests
 import time
 import csv
-#import os
-from tqdm import tqdm
+import os
 import json
-
-def safe_request(url, max_retries=5, delay=5, fail_delay=60):
-    attempt = 0
-    while attempt < max_retries:
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                return response, delay
-            else:
-                attempt += 1
-                print(f"Encountered HTTP error {response.status_code}, attempt {attempt}/{max_retries}. Retrying in {fail_delay}s...")
-                if response.status_code == 429:
-                    print(f"Error code 429 suggests too many requests. Increasing delay between attempts")
-                    delay *= 2
-        except requests.exceptions.RequestException as e:
-            attempt += 1
-            print(f"Connection error, attempt {attempt}/{max_retries}: {e}")
-
-        if attempt == max_retries:
-            print("Exceeded number of failed attempts for a single request. Terminating program.\nPlease check your internet connection or pokeapi.co status.")
-            raise
-        time.sleep(fail_delay)
+import ast
+from tqdm import tqdm
+from create_trie import create_trie
+from types_chart import create_types_chart
+from safe_request import safe_request
 
 def proper_name(name):
     special_names = {"ho-oh": "Ho-Oh",
@@ -114,6 +96,10 @@ def create_database(path_to_csv, limit=None):
     #                  "sirfetchd": "Sirfetch'd",
     #                  "type-null": "Type: Null",
     #                  }
+    if limit == None:
+        print(f"Creating database, consisting of {number_of_pokemon} Pokémon.")
+    else:
+        print(f"Creating database consiting of {limit} Pokémon.")
     with open(csv_path, mode='w', newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)  
         writer.writerow(['National Dex', 'Name', 'Types', 'Abilities', 'Stats', 'Base Stats Total'])  
@@ -173,3 +159,84 @@ if __name__ == "__main__":
     print("This function is not supposed to be run directly.")
     print("Please use main.py to work with the database.")
     exit(1)
+
+def create_type_pokemon_list(wanted_type, type_chart_path, database_path):
+    list_of_types = create_type_list(type_chart_path)
+    
+    if wanted_type not in list_of_types:
+        raise Exception(f"Type \"{wanted_type}\" doesn't seem to exist. Make sure type name is correct.")
+    
+    print(f"Creating file: list of Pokémon with {wanted_type} type")
+    type_file_path = os.path.join(os.path.dirname(database_path), f'{wanted_type}.csv')
+    
+    with open(database_path, mode='r', newline='', encoding='utf-8') as file:
+        data = csv.reader(file)
+        next(data)
+        with open(type_file_path, mode='w', newline='', encoding='utf-8') as type_file:
+            writer = csv.writer(type_file, quoting=csv.QUOTE_ALL)
+            writer.writerow(['Pokédex number','Pokémon name', 'Second type'])
+            written = 0
+            for row in data:
+                types_list = ast.literal_eval(row[2])
+                if wanted_type in types_list:
+                    pokemon_name = row[1]
+                    pokemon_number = row[0]
+                    if len(types_list) > 1:
+                        if types_list[0] == wanted_type:
+                            second_type = types_list[1]
+                        else:
+                            second_type = types_list[0]
+                    else:
+                        second_type = "None"
+                    writer.writerow([pokemon_number, pokemon_name, second_type])
+                    written += 1
+    if written == 0:
+        print(f"No Pokémon with {wanted_type} found. Deleting file {wanted_type}.csv")
+        os.remove(type_file_path)
+    
+def create_everything(database_path, types_path, trie_path, data_dir, force=False, limit=None):
+
+    if not os.path.isdir(data_dir):
+        print("Data directory not found, creating it together with its contents.")
+        os.makedirs(data_dir, exist_ok=True)
+        force = True
+    elif not os.path.isfile(database_path):
+        print("File database.csv not found. Creating all files.")
+        force = True
+    
+    if force:
+        create_database(database_path, limit=limit)
+        create_trie(database_path, trie_path)
+        create_types_chart(types_path)
+        create_type_files(types_path, database_path)
+        return
+    
+    if not os.path.isfile(trie_path):
+        print("Trie not found. Creating it.")
+        create_trie(database_path, trie_path)
+
+    if not os.path.isfile(types_path):
+        print("File types_chart.csv not found. Creating it.")
+        create_types_chart(types_path)
+        create_type_files(types_path, database_path)
+        return
+    
+    list_of_types = create_type_list(types_path)
+    for wanted_type in list_of_types:
+        if not os.path.isfile(os.path.join(data_dir, f'{wanted_type}.csv')):
+            create_type_pokemon_list(wanted_type, types_path, database_path)
+
+
+def create_type_files(types_path, database_path):
+    list_of_types = create_type_list(types_path)
+    for wanted_type in list_of_types:
+        create_type_pokemon_list(wanted_type, types_path, database_path)
+
+def create_type_list(types_path):
+    with open(types_path, mode='r', newline='', encoding='utf-8') as file:
+        data = csv.reader(file)
+        next(data)
+        list_of_types = []
+        for row in data:
+            list_of_types.append(row[0])
+    return list_of_types
