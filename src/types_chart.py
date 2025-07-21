@@ -5,8 +5,9 @@ import json
 #import os
 from tqdm import tqdm
 from safe_request import safe_request
+from config import types_path
 
-def create_types_chart(path_to_csv):
+def create_types_chart():
     url = 'https://pokeapi.co/api/v2/type/?limit=100'
     # fail_count = 0
     max_retries = 5
@@ -34,9 +35,8 @@ def create_types_chart(path_to_csv):
     base_dictionary = {}
     for type in list_of_types:
         base_dictionary[type] = 1
-    csv_path = path_to_csv
 
-    with open(csv_path, mode='w', newline='', encoding='utf-8') as csv_file:
+    with open(types_path, mode='w', newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)  
         writer.writerow(['Type', 'Dictionary of defensive type effectiveness', 'Dictionary of offensive type effectiveness'])
         for i in tqdm(range(0, total_types - 2), desc="Fetching Pokémon data..."): #Number of types is decreased by 2, because, as of creating this program, last two typeps are types not used in case of normal Pokémon(unknown and shadow), let's hope this won't change in the future

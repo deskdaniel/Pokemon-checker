@@ -1,9 +1,12 @@
 import csv
-from create_trie import import_trie
 import os
+import json
+from create_trie import import_trie
 from database import proper_name, create_type_list
+from config import database_path, types_path, data_dir, trie_path
+from pokemon_class import Pokemon
 
-def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
+def search_by_number(query, attempts_so_far=0, max_attempts=5):
     with open(database_path, mode='r', newline='', encoding='utf-8') as file:
         data = list(csv.reader(file))[1:]
         attempt = attempts_so_far
@@ -30,7 +33,14 @@ def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
 
             for row in data:
                 if row[0].lstrip("0") == clean_query:
-                    results.append(row[1])
+                    number = row[0]
+                    name = row[1]
+                    types = row[2]
+                    abilities = row[3]
+                    stats = json.loads(row[4])
+                    bst = row[5]
+                    pokemon = [number, name, types, abilities, stats, bst]
+                    results.append(pokemon)
 
             if len(results) == 0:
                 attempt += 1
@@ -41,11 +51,11 @@ def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
                 print("Please try again. You can type \"exit\" to return to main menu.")
                 query = input("Waiting for Pokédex number input:")
             elif len(results) == 1:
-                print(f"Found Pokémon with Pokédex number {clean_query}, it's {results[0]}.")
-                return results[0]
+                print(f"Found Pokémon with Pokédex number {clean_query}, it's {results[0][1]}.")
+                return Pokemon(*results[0])
             else:
-                choices = "\n".join(f"{i+1} {name}" for i, name in enumerate(results))
-                normalized_results = {name.lower(): name for name in results}
+                choices = "\n".join(f"{i+1} {result[1]}" for i, result in enumerate(results))
+                normalized_results = {result[1].lower(): result for result in results}
                 print(f"Found more than 1 match for this Pokédex number({clean_query}). It has more forms than one.")
                 print(f"Pick one(write a name from list or number corresponding to choosen name) from the following list:\n{choices}")
                 while attempt_choice < max_attempts:
@@ -62,7 +72,7 @@ def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
                             continue
                         index = int(search)
                         if index > 0 and index <= len(results):
-                            return proper_name(results[index - 1])
+                            return Pokemon(*results[index - 1])
                         else:
                             attempt_choice += 1
                             if attempt_choice == max_attempts:
@@ -74,7 +84,8 @@ def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
                         if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
                             return "abort"
                     elif search.lower() in normalized_results:
-                        return normalized_results[search.lower()]
+                        selected = normalized_results[search.lower()]
+                        return Pokemon[*selected]
                     else:
                         attempt_choice += 1
                         if attempt_choice == max_attempts:
@@ -82,9 +93,8 @@ def search_by_number(query, database_path, attempts_so_far=0, max_attempts=5):
                             return None
                         print(f"Incorrect name. Please try again(attempt {attempt_choice} out of {max_attempts}). You can type \"exit\" to return to main menu. Here's the list once again:\n{choices}")
 
-def search_by_name(query, database_path, attempts_so_far=0, max_attempts=5):
-    path_to_json = os.path.join(os.path.dirname(database_path), "pokemon_trie.json")
-    pokemon_trie = import_trie(path_to_json)
+def search_by_name(query, attempts_so_far=0, max_attempts=5):
+    pokemon_trie = import_trie(trie_path)
     
     attempt_choice = attempts_so_far
     attempt = attempts_so_far
@@ -108,10 +118,10 @@ def search_by_name(query, database_path, attempts_so_far=0, max_attempts=5):
                 query = input("Waiting for Pokémon name input:")
         elif len(results) == 1:
             print("Found Pokémon")
-            return pokemon_trie[results[0]]
+            return Pokemon(*pokemon_trie[results[0]])
         else:
-            choices = "\n".join(f"{i+1} {name}" for i, name in enumerate(results))
-            normalized_results = {name.lower(): name for name in results}
+            choices = "\n".join(f"{i+1} {result[1]}" for i, result in enumerate(results))
+            normalized_results = {result[1].lower(): result for result in results}
             print(f"Found more than 1 match for this search term(\"{query}\").")
             print(f"Pick one(write a name from list or number corresponding to choosen name) from the following list:\n{choices}")
             while attempt_choice < max_attempts:
@@ -121,7 +131,7 @@ def search_by_name(query, database_path, attempts_so_far=0, max_attempts=5):
                     search = search.lstrip("0")
                     index = int(search)
                     if index > 0 and index <= len(results):
-                        return pokemon_trie[results[index - 1]]
+                        return Pokemon(*pokemon_trie[results[index - 1]])
                     else:
                         attempt_choice += 1
                         if attempt_choice == max_attempts:
@@ -133,7 +143,8 @@ def search_by_name(query, database_path, attempts_so_far=0, max_attempts=5):
                     if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
                         return "abort"
                 elif search.lower() in normalized_results:
-                    return normalized_results[search.lower()]
+                    selected = normalized_results[search.lower()]
+                    return Pokemon(*selected)
                 else:
                     attempt_choice += 1
                     if attempt_choice == max_attempts:
@@ -141,7 +152,7 @@ def search_by_name(query, database_path, attempts_so_far=0, max_attempts=5):
                         return None
                     print(f"Incorrect name. Please try again(attempt {attempt_choice} out of {max_attempts}). Here's the list once again:\n{choices}")
 
-def search_by_type(query, data_dir, types_path):
+def search_by_type(query):
     attempt = 0
     max_attempts = 5
     list_of_types = create_type_list(types_path)
