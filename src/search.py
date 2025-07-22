@@ -23,7 +23,7 @@ def search_by_number(query, attempts_so_far=0, max_attempts=5):
                     print("Too many failed attempts. Terminating search.")
                     return None
                 print("Please try again. You can type \"exit\" to return to main menu.")
-                query = input("Waiting for Pokédex number input:")
+                query = input("Waiting for Pokédex number input:\n>>")
                 continue
 
             if not clean_query.isdigit():
@@ -49,7 +49,7 @@ def search_by_number(query, attempts_so_far=0, max_attempts=5):
                     print("Too many failed attempts. Terminating search.")
                     return None
                 print("Please try again. You can type \"exit\" to return to main menu.")
-                query = input("Waiting for Pokédex number input:")
+                query = input("Waiting for Pokédex number input:\n>>")
             elif len(results) == 1:
                 print(f"Found Pokémon with Pokédex number {clean_query}, it's {results[0][1]}.")
                 return Pokemon(*results[0])
@@ -59,7 +59,7 @@ def search_by_number(query, attempts_so_far=0, max_attempts=5):
                 print(f"Found more than 1 match for this Pokédex number({clean_query}). It has more forms than one.")
                 print(f"Pick one(write a name from list or number corresponding to choosen name) from the following list:\n{choices}")
                 while attempt_choice < max_attempts:
-                    search = input("Waiting for name or number input:")
+                    search = input("Waiting for name or number input:\n>>")
                     search = search.strip()
                     if search.isdigit():
                         search = search.lstrip("0")
@@ -82,7 +82,7 @@ def search_by_number(query, attempts_so_far=0, max_attempts=5):
                     elif search.lower() == "exit":
                         confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?")
                         if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
-                            return "abort"
+                            return None
                     elif search.lower() in normalized_results:
                         selected = normalized_results[search.lower()]
                         return Pokemon[*selected]
@@ -103,9 +103,9 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
     while attempt < max_attempts:
         query = query.lower().strip()
         if query == "exit":
-            confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?")
+            confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?\n>>")
             if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
-                return "abort"
+                return None
         results = list(pokemon_trie.iterkeys(prefix=query))
         if len(results) == 0:
             attempt += 1
@@ -115,7 +115,7 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
                 return None
             else:
                 print("Please try again. You can type \"exit\" to return to main menu.")
-                query = input("Waiting for Pokémon name input:")
+                query = input("Waiting for Pokémon name input:\n>>")
         elif len(results) == 1:
             print("Found Pokémon")
             return Pokemon(*pokemon_trie[results[0]])
@@ -125,7 +125,7 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
             print(f"Found more than 1 match for this search term(\"{query}\").")
             print(f"Pick one(write a name from list or number corresponding to choosen name) from the following list:\n{choices}")
             while attempt_choice < max_attempts:
-                search = input("Waiting for name or number input:")
+                search = input("Waiting for name or number input:\n>>")
                 search = search.strip()
                 if search.isdigit():
                     search = search.lstrip("0")
@@ -139,9 +139,9 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
                             return None
                         print(f"Specified number is out of list's range. Please try again(attempt {attempt_choice} out of {max_attempts}). Here's the list once again:\n{choices}")
                 elif search.lower() == "exit":
-                    confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?")
+                    confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?\n>>")
                     if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
-                        return "abort"
+                        return None
                 elif search.lower() in normalized_results:
                     selected = normalized_results[search.lower()]
                     return Pokemon(*selected)
@@ -161,9 +161,9 @@ def search_by_type(query):
         types_to_search = query.split()
 
         if types_to_search[0].lower() == "exit":
-            confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for type \"exit\"?")
+            confirm = input(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for type \"exit\"?\n>>")
             if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
-                return "abort"
+                return None
 
         if len(types_to_search) != 1 and len(types_to_search) != 2:
             attempt += 1
@@ -171,7 +171,7 @@ def search_by_type(query):
                 print("Too many failed attempts. Terminating search.")
                 return None
             print("Incorrect usage of function. Try again, but without typing \"type\" at the beginning. You can type \"exit\" to return to main menu.")
-            query = input("Waiting for type name(s) input:")
+            query = input("Waiting for type name(s) input:\n>>")
         else:
             if types_to_search[0].capitalize() not in list_of_types:
                 attempt += 1
@@ -179,7 +179,7 @@ def search_by_type(query):
                     print("Too many failed attempts. Terminating search.")
                     return None
                 print(f"Type {types_to_search[0]} is wrong name of type. Please try again, but without typing \"type\" at the beginning. You can type \"exit\" to return to main menu.")
-                query = input("Waiting for type name(s) input:")
+                query = input("Waiting for type name(s) input:\n>>")
             else:
                 path_to_type_file = os.path.join(data_dir, f'{types_to_search[0]}.csv')
                 with open(path_to_type_file, mode='r', newline='', encoding='utf-8') as type_file:
@@ -192,7 +192,7 @@ def search_by_type(query):
                                 print("Too many failed attempts. Terminating search.")
                                 return None
                             print(f"Type {types_to_search[1]} is wrong name of type. Please try again, but without typing \"type\" at the beginning. You can type \"exit\" to return to main menu.")
-                            query = input("Waiting for type name(s) input:")
+                            query = input("Waiting for type name(s) input:\n>>")
                             continue
                     for row in data:
                         if len(types_to_search) == 1:

@@ -205,11 +205,18 @@ def create_everything(database_path, types_path, trie_path, data_dir, force=Fals
         force = True
     
     if force:
-        create_database(database_path, limit=limit)
-        create_trie(database_path, trie_path)
-        create_types_chart(types_path)
-        create_type_files(types_path, database_path)
-        return
+        confirm = input("You're about to force updating whole database. It should take approximately 5-10 minutes. Do you want to continue [Y(es)]?\n")
+        confirm = confirm.strip()
+        if confirm.lower() == "y" or confirm.lower() == "yes":
+            print("Recreating database. Please wait.")
+            create_database(database_path, limit=limit)
+            create_trie(database_path, trie_path)
+            create_types_chart(types_path)
+            create_type_files(types_path, database_path)
+            return
+        else:
+            print("Recreating of database cancelled.")
+            return
     
     if not os.path.isfile(trie_path):
         print("Trie not found. Creating it.")

@@ -7,26 +7,40 @@ def format_effectiveness_list(type_list):
     else:
         type_list = "None"
 
-def display_search_results(pokemon):
-    types = ", ".join(pokemon.types)
-    abilities = ", ".join(pokemon.abilities)
-    warning = None
-
+def has_only_altering_ability(pokemon, return_warning=True):
     if len(pokemon.abilities) == 1 and pokemon.abilities[0] in damage_altering_abilities:
         warning = f"Warning! Pokémon has only 1 ability and it changes its defensive properties. Below are its defensive properties with this ability ({pokemon.abilities[0]}) taken into account."
         ability = pokemon.abilities[0]
         condition = damage_altering_abilities[ability].get("condition")
-        if condition == "super effective":
-            for key, multiplier in pokemon.defensive_damage_multipliers.items():
-                if multiplier > 1:
-                    pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability]["multiplier"]
-        elif condition == "not super effective":
-            for key, multiplier in pokemon.defensive_damage_multipliers.items():
-                if multiplier <= 1:
-                    pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability]["multiplier"]
-        else:
-            for key in damage_altering_abilities[ability]:
-                pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability][key]
+    else:
+        return None
+    
+    if condition == "super effective":
+        for key, multiplier in pokemon.defensive_damage_multipliers.items():
+            if multiplier > 1:
+                pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability]["multiplier"]
+    elif condition == "not super effective":
+        for key, multiplier in pokemon.defensive_damage_multipliers.items():
+            if multiplier <= 1:
+                pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability]["multiplier"]
+    else:
+        for key in damage_altering_abilities[ability]:
+            pokemon.defensive_damage_multipliers[key] *= damage_altering_abilities[ability][key]
+    if return_warning == True:
+        return warning
+    
+def possible_altering_abilities(pokemon, altering_abilities):
+    if len(pokemon.abilities) > 1 and len(altering_abilities) > 0:
+        print(f"Warning! Pokémon may have an ability ({', '.join(altering_abilities)}), which changes type effectiveness.")
+    for each in altering_abilities:
+        print(f"{each} changes effectiveness of {', '.join(damage_altering_abilities[each].keys())}")
+        print("When planning matchup for this Pokémon, please take into account possibility of effectivenes of these type(s) to change.")
+    
+def display_search_results(pokemon):
+    types = ", ".join(pokemon.types)
+    abilities = ", ".join(pokemon.abilities)
+
+    warning = has_only_altering_ability(pokemon)
 
     x4_defensive = []
     x2_defensive = []
@@ -91,11 +105,8 @@ def display_search_results(pokemon):
     print(f"\tx0.5 resistance: {defensive_0_5}")
     print(f"\tx0.25 resistance: {defensive_0_25}")
     print(f"\tImmunities: {defensive_0}")
-    if len(pokemon.abilities) > 1 and len(altering_abilities) > 0:
-        print(f"Warning! Pokémon may have an ability ({', '.join(altering_abilities)}), which changes type effectiveness.")
-        for each in altering_abilities:
-            print(f"{each} changes effectiveness of {', '.join(damage_altering_abilities[each].keys())}")
-            print("When planning matchup for this Pokémon, please take into account possibility of effectivenes of these type(s) to change.")
+    possible_altering_abilities(pokemon, altering_abilities)
+    
     print()
     print("Offensive type effectiveness of Pokémon:")
     print(f"\tSuper effective (x2): {offensive_2}")
