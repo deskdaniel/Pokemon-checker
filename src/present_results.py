@@ -1,11 +1,13 @@
 from pokemon_class import Pokemon
 from config import damage_altering_abilities
+from wrap_text import wrap_text
 
 def format_effectiveness_list(type_list):
     if len(type_list) > 0:
-        type_list = ", ".join(type_list)
+        final_string = ", ".join(type_list)
     else:
-        type_list = "None"
+        final_string = "None"
+    return final_string
 
 def has_only_altering_ability(pokemon, return_warning=True):
     if len(pokemon.abilities) == 1 and pokemon.abilities[0] in damage_altering_abilities:
@@ -31,10 +33,10 @@ def has_only_altering_ability(pokemon, return_warning=True):
     
 def possible_altering_abilities(pokemon, altering_abilities):
     if len(pokemon.abilities) > 1 and len(altering_abilities) > 0:
-        print(f"Warning! Pokémon may have an ability ({', '.join(altering_abilities)}), which changes type effectiveness.")
+        print(wrap_text(f"Warning! Pokémon {pokemon.name} may have an ability ({', '.join(altering_abilities)}), which changes type effectiveness."))
     for each in altering_abilities:
-        print(f"{each} changes effectiveness of {', '.join(damage_altering_abilities[each].keys())}")
-        print("When planning matchup for this Pokémon, please take into account possibility of effectivenes of these type(s) to change.")
+        print(wrap_text(f"{each} changes effectiveness of {', '.join(damage_altering_abilities[each].keys())}"))
+        print(wrap_text("When planning matchup for this Pokémon, please take into account possibility of effectivenes of these type(s) to change."))
     
 def display_search_results(pokemon):
     types = ", ".join(pokemon.types)
@@ -61,6 +63,7 @@ def display_search_results(pokemon):
             x0_25_defensive.append(key)
         else:
             x0_defensive.append(key)
+
     defensive_4 = format_effectiveness_list(x4_defensive)
     defensive_2 = format_effectiveness_list(x2_defensive)
     defensive_1 = format_effectiveness_list(x1_defensive)
@@ -91,29 +94,29 @@ def display_search_results(pokemon):
         if ability in damage_altering_abilities:
             altering_abilities.append(ability)
 
-    print(f"Searched Pokémon: {pokemon.number}. {pokemon.name}.")
+    print(wrap_text(f"Searched Pokémon: {pokemon.number}. {pokemon.name}."))
 
-    print(f"Its type(s) are: {types}. | Its possible abilities: {abilities}.")
+    print(wrap_text(f"Its type(s) are: {types}. | Its possible abilities: {abilities}."))
 
     if warning:
-        print(warning)
+        print(wrap_text(warning))
     print()
-    print("Defensive type effectiveness of Pokémon:")
-    print(f"\t4x weaknesses: {defensive_4}")
-    print(f"\t2x weaknesses: {defensive_2}")
-    print(f"\tNeutral damage: {defensive_1}")
-    print(f"\tx0.5 resistance: {defensive_0_5}")
-    print(f"\tx0.25 resistance: {defensive_0_25}")
-    print(f"\tImmunities: {defensive_0}")
+    print(wrap_text("Defensive type effectiveness of Pokémon:"))
+    print(wrap_text(f"\t4x weaknesses: {defensive_4}"))
+    print(wrap_text(f"\t2x weaknesses: {defensive_2}"))
+    print(wrap_text(f"\tNeutral damage: {defensive_1}"))
+    print(wrap_text(f"\tx0.5 resistance: {defensive_0_5}"))
+    print(wrap_text(f"\tx0.25 resistance: {defensive_0_25}"))
+    print(wrap_text(f"\tImmunities: {defensive_0}"))
     possible_altering_abilities(pokemon, altering_abilities)
     
     print()
-    print("Offensive type effectiveness of Pokémon:")
-    print(f"\tSuper effective (x2): {offensive_2}")
-    print(f"\tNeutral (x1): {offensive_1}")
-    print(f"\tNot very effective (x0.5): {offensive_0_5}")
-    print(f"\tNo effect (x0): {offensive_0}")
+    print(wrap_text("Offensive type effectiveness of Pokémon:"))
+    print(wrap_text(f"\tSuper effective (x2): {offensive_2}"))
+    print(wrap_text(f"\tNeutral (x1): {offensive_1}"))
+    print(wrap_text(f"\tNot very effective (x0.5): {offensive_0_5}"))
+    print(wrap_text(f"\tNo effect (x0): {offensive_0}"))
     print()
-    print("Pokémon base stats:")
-    print(f"HP: {pokemon.stats["HP"]} | Attack: {pokemon.stats["Attack"]} | Defense: {pokemon.stats["Defense"]} | Special Attack: {pokemon.stats["Special-attack"]} | Special Defense: {pokemon.stats["Special-defense"]} | Speed: {pokemon.stats["Speed"]}")
-    print(f"Pokémon base stats total: {pokemon.bst}")
+    print(wrap_text("Pokémon base stats:"))
+    print(wrap_text(f"HP: {pokemon.stats["HP"]} | Attack: {pokemon.stats["Attack"]} | Defense: {pokemon.stats["Defense"]} | Special Attack: {pokemon.stats["Special-attack"]} | Special Defense: {pokemon.stats["Special-defense"]} | Speed: {pokemon.stats["Speed"]}"))
+    print(wrap_text(f"Pokémon base stats total: {pokemon.bst}"))

@@ -8,6 +8,7 @@ from fight import fight
 from print_help import print_help
 from pokemon_class import Pokemon
 from present_results import display_search_results
+from wrap_text import wrap_text
 
 def parse_input(user_input):
     try:
@@ -23,13 +24,18 @@ def main():
     force = False
     key_words = ["help", "exit", "quit", "q", "update", "search", "type", "fight"]
 
-    print("Welcome to Pokémon Checker!")
-    print("Please wait as I check if database is present.")
-    create_everything(database_path, types_path, trie_path, data_dir, force=force, limit=limited)
-    print("Database detected. Have fun.")
+    print(wrap_text("Welcome to Pokémon Checker!"))
+    print(wrap_text("Please wait as I check if database is present."))
+    result = create_everything(force=force, limit=limited)
+    if result == "cancel" and not os.path.isfile(database_path):
+        print(wrap_text("Creation of database cancelled. Program can't work without database. Please run program again when you're ready to create database."))
+        raise Exception("No database")
+    print(wrap_text("Database detected. Have fun."))
     
     while True:
-        user_input = input("Waiting for user input. Type \"help\" if you need instructions on usage:\n>>").strip()
+        print(wrap_text("Waiting for user input. Type \"help\" if you need instructions on usage:"))
+        user_input = input(wrap_text(">>")).strip()
+        
 
         if not user_input:
             continue
@@ -40,16 +46,16 @@ def main():
             if command == "help":
                 print_help()
             elif command == "exit" or command == "quit" or command == "q":
-                print("Goodbye :)")
+                print(wrap_text("Goodbye :)"))
                 break
             elif command == "update":
                 create_everything(database_path, types_path, trie_path, data_dir, force=True, limit=limited)
             elif command == "search":
                 if len(args) > 1:
-                    print("Too many arguments used with command \"search\". If you're searching for a Pokémon with spaces in its name (like Tapu Koko), please use quotation marks.")
+                    print(wrap_text("Too many arguments used with command \"search\". If you're searching for a Pokémon with spaces in its name (like Tapu Koko), please use quotation marks."))
                     continue
                 if len(args) == 0:
-                    print("No search criteria detected. Please try again.")
+                    print(wrap_text("No search criteria detected. Please try again."))
                     continue
                 if len(args) == 1:
                     if args[0].strip().isdigit():
@@ -59,20 +65,20 @@ def main():
                     if isinstance(pokemon, Pokemon):
                         display_search_results(pokemon)
                     else:
-                        print("Pokémon not found. Please check the name and try again.")
+                        print(wrap_text("Pokémon not found. Please check the name and try again."))
                         continue                    
             elif command == "type":
                 if len(args) == 0:
-                    print("No search criteria detected. Please try again.")
+                    print(wrap_text("No search criteria detected. Please try again."))
                     continue
                 query = " ".join(args)
                 search_by_type(query)
             elif command == "fight":
                 if len(args) < 2:
-                    print("Not enough arguments given. If you need reminder on usage type \"help\".")
+                    print(wrap_text("Not enough arguments given. If you need reminder on usage type \"help\"."))
                     continue
                 elif len(args) > 3:
-                    print("Too many arguments used with command \"fight\". If you're searching for a Pokémon with spaces in its name (like Tapu Koko), please use quotation marks.")
+                    print(wrap_text("Too many arguments used with command \"fight\". If you're searching for a Pokémon with spaces in its name (like Tapu Koko), please use quotation marks."))
                     continue
                 elif len(args) == 2:
                     level = 50
@@ -83,10 +89,10 @@ def main():
                 if isinstance(pokemon1, Pokemon) and isinstance(pokemon2, Pokemon):
                     fight(pokemon1, pokemon2, level)
                 else:
-                    print("One or both of Pokémon not found. Please check the names and try again.")
+                    print(wrap_text("One or both of Pokémon not found. Please check the names and try again."))
                     continue
         else:
-            print(f"Command: {command} not recognized. Please try again.")
+            print(wrap_text(f"Command: {command} not recognized. Please try again."))
             continue
 
 main()

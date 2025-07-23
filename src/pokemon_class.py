@@ -12,7 +12,7 @@ class Pokemon():
         self.abilities = abilities
         self.stats = stats
         self.bst = bst
-        types_list = create_type_list(types_path)
+        types_list = create_type_list()
         self.defensive_damage_multipliers = self._set_defensive_multipliers(types_list)
         self.offensive_damage_multipliers = self._set_offensive_multipliers(types_list)
     

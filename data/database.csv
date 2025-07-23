@@ -1,3 +1,4 @@
+"Expected Pokémon Count:","1268"
 "National Dex","Name","Types","Abilities","Stats","Base Stats Total"
 "1","Bulbasaur","['Grass', 'Poison']","['Overgrow', 'Chlorophyll']","{""HP"": 45, ""Attack"": 49, ""Defense"": 49, ""Special-attack"": 65, ""Special-defense"": 65, ""Speed"": 45}","318"
 "2","Ivysaur","['Grass', 'Poison']","['Overgrow', 'Chlorophyll']","{""HP"": 60, ""Attack"": 62, ""Defense"": 63, ""Special-attack"": 80, ""Special-defense"": 80, ""Speed"": 60}","405"

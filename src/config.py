@@ -1,6 +1,6 @@
 import os
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(root_dir, "data")
 database_path = os.path.join(data_dir, "database.csv")
 types_path = os.path.join(data_dir, "types_chart.csv")

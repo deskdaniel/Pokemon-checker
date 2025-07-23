@@ -6,6 +6,7 @@ import json
 from tqdm import tqdm
 from safe_request import safe_request
 from config import types_path
+from wrap_text import wrap_text
 
 def create_types_chart():
     url = 'https://pokeapi.co/api/v2/type/?limit=100'
@@ -14,7 +15,7 @@ def create_types_chart():
     delay = 0.2
     fail_delay = 60
 
-    print("Starting process of creating Pokémon type chart")
+    print(wrap_text("Starting process of creating Pokémon type chart"))
     # number_of_types_check = requests.get(url)
     # while number_of_types_check.status_code != 200 and fail_count < max_retries:
     #     fail_count += 1
@@ -102,6 +103,6 @@ def create_types_chart():
     return
 
 if __name__ == "__main__":
-    print("This function is not supposed to be run directly.")
-    print("Please use main.py to work with the database.")
+    print(wrap_text("This function is not supposed to be run directly."))
+    print(wrap_text("Please use main.py to work with the database."))
     exit(1)
