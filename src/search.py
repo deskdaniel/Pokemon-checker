@@ -245,4 +245,4 @@ def search_by_type(query):
                 print(wrap_text("Below is a list with Pokémon of specified types. Its format is <Pokédex number>. <Pokémon name>"))
                 print(result)
                 print(wrap_text("If you want more detailed information about any Pokémon type: \"search <Pokémon name>\" or \"search <Pokédex number>\""))
-                return
+                return result

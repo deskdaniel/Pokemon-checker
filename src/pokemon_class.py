@@ -1,7 +1,7 @@
 import json
 import csv
 from database import create_type_list
-from config import types_path
+from config import types_path, damage_altering_abilities
 
 
 class Pokemon():
@@ -28,6 +28,7 @@ class Pokemon():
                     type_multipiers = json.loads(row[1])
                     for key in defensive_values:
                         defensive_values[key] *= type_multipiers[key]
+        self.has_only_altering_ability(defensive_values)
         return defensive_values
     
     def _set_offensive_multipliers(self, types_list):
@@ -43,3 +44,22 @@ class Pokemon():
                     for key in offensive_values:
                         offensive_values[key] = max(offensive_values[key], type_multipiers[key])
         return offensive_values
+    
+    def has_only_altering_ability(self, defensive_values):
+        if len(self.abilities) == 1 and self.abilities[0] in damage_altering_abilities:
+            ability = self.abilities[0]
+            condition = damage_altering_abilities[ability].get("condition")
+        else:
+            return None
+        
+        if condition == "super effective":
+            for key, multiplier in defensive_values.items():
+                if multiplier > 1:
+                    defensive_values[key] *= damage_altering_abilities[ability]["multiplier"]
+        elif condition == "not super effective":
+            for key, multiplier in defensive_values.items():
+                if multiplier <= 1:
+                    defensive_values[key] *= damage_altering_abilities[ability]["multiplier"]
+        else:
+            for key in damage_altering_abilities[ability]:
+                defensive_values[key] *= damage_altering_abilities[ability][key]

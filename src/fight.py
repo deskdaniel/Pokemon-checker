@@ -1,5 +1,5 @@
 import math
-from present_results import has_only_altering_ability, possible_altering_abilities
+from present_results import possible_altering_abilities
 from config import damage_altering_abilities
 from wrap_text import wrap_text
 
@@ -98,6 +98,12 @@ def turns_to_knock_out(level, pokemon1_base_attack, pokemon2_base_defense, pokem
         raise ValueError(wrap_text("Incorrect damage value. Terminating program. Please report the issue to the author."))
     return turns_to_knock_out
 
+def ability_warning(pokemon):
+    if len(pokemon.abilities) == 1 and pokemon.abilities[0] in damage_altering_abilities:
+        warning = f"Warning! {pokemon.name} has only 1 ability and it changes its defensive properties. This simulatio takes this ability ({pokemon.abilities[0]})into account.\nIf you have a way to ignore this ability you can change its defensive properties."
+        print(wrap_text(warning))
+    possible_altering_abilities(pokemon)
+
 def fight(pokemon1, pokemon2, level=50, max_attemps=5):
     level = str(level)
     attempts = 0
@@ -114,26 +120,14 @@ def fight(pokemon1, pokemon2, level=50, max_attemps=5):
         else:
             break
 
-    pokemon1_altering_abilities = []
-    for ability in pokemon1.abilities:
-        if ability in damage_altering_abilities:
-            pokemon1_altering_abilities.append(ability)
-    
-    
-    pokemon2_altering_abilities = []
-    for ability in pokemon2.abilities:
-        if ability in damage_altering_abilities:
-            pokemon2_altering_abilities.append(ability)
-   
 
     print(wrap_text(f"{pokemon1.name} VS {pokemon2.name}"))
     print(wrap_text(f"{pokemon1.name} types: {pokemon1.types}"))
     print(wrap_text(f"{pokemon2.name} types: {pokemon2.types}"))
-    possible_altering_abilities(pokemon1, pokemon1_altering_abilities)
-    possible_altering_abilities(pokemon2, pokemon2_altering_abilities)
 
-    has_only_altering_ability(pokemon1, return_warning=False)
-    has_only_altering_ability(pokemon2, return_warning=False)
+    ability_warning(pokemon1)
+    ability_warning(pokemon2)
+
     pokemon1_effective_on_pokemon2 = pokemon_effective(pokemon1, pokemon2)
     pokemon2_effective_on_pokemon1 = pokemon_effective(pokemon2, pokemon1)
 
