@@ -19,13 +19,13 @@ def search_by_number(query, attempts_so_far=0, max_attempts=5):
             clean_query = clean_query.lstrip("0")
             
             if clean_query == "":
-                print(wrap_text(f"Invalid input, there's no Pokémon with Pokédex number: {query}"))
+                print(wrap_text(f"Invalid input, {query} is not a valid Pokédex number."))
                 attempt += 1
                 if attempt == max_attempts:
                     print(wrap_text("Too many failed attempts. Terminating search."))
                     return None
                 print(wrap_text("Please try again. You can type \"exit\" to return to main menu."))
-                print(wrap_text("Waiting for Pokédex number input:"))
+                print(wrap_text("Waiting for Pokémon name or Pokédex number input:"))
                 query = input(">>")
                 continue
 
@@ -108,16 +108,27 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
     max_attempts = max_attempts
 
     while attempt < max_attempts:
-        query = query.lower().strip()
-        if query.isdigit():
-            return search_by_number(query, attempt, max_attempts)
-        if query == "exit":
+        clean_query = query.lower().strip()
+        if clean_query.isdigit():
+            return search_by_number(clean_query, attempt, max_attempts)
+        elif clean_query == "exit":
             print(wrap_text(f"Input \"exit\" detected. Do you want to exit [Y(es)] or search for prefix \"exit\"?"))
             confirm = input(">>")
             if confirm.lower().strip() == "y" or confirm.lower().strip() == "yes":
                 return None
+        elif clean_query == "":
+            attempt += 1
+            print(wrap_text("Empty input detected."))
+            if attempt == max_attempts:
+                print(wrap_text("Too many failed attempts. Terminating search."))
+                return None
+            else:
+                print(wrap_text("Please try again. You can type \"exit\" to return to main menu."))
+                print(wrap_text("Waiting for Pokémon name or Pokédex number input:"))
+                query = input(">>")
+                continue
         try:
-            results = list(pokemon_trie.iterkeys(prefix=query))
+            results = list(pokemon_trie.iterkeys(prefix=clean_query))
         except KeyError:
             attempt += 1
             print(wrap_text(f"No Pokémon matching prefix: \"{query}\" found."))
@@ -138,7 +149,7 @@ def search_by_name(query, attempts_so_far=0, max_attempts=5):
                 return None
             else:
                 print(wrap_text("Please try again. You can type \"exit\" to return to main menu."))
-                print(wrap_text("Waiting for Pokémon name input:"))
+                print(wrap_text("Waiting for Pokémon name or Pokédex number input:"))
                 query = input(">>")
         elif len(results) == 1:
             print(wrap_text("Found Pokémon"))
