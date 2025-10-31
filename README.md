@@ -1,4 +1,4 @@
-# Pokemon-checker
+# PokeIntel
 An app running in REPL mode that lets you check information about Pokémon.
 
 ## Motivation
